@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Свадебное приглашение — Игорь и Ольга</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --burgundy: #7d1a1a;
+            --cream: #f9f7f2;
+            --white: #ffffff;
+            --overlay: rgba(249, 247, 242, 0.75);
+            --transition-speed: 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-style: normal !important;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--cream);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--burgundy);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            touch-action: pan-y;
+        }
+
+        /* 1. ПРЕЛОАДЕР */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--cream);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+        #loader-number { font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 10px; }
+        .loader-bar-bg { width: 150px; height: 1px; background: rgba(125, 26, 26, 0.1); position: relative; }
+        #loader-bar-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0; background: var(--burgundy); transition: width 0.3s ease; }
+
+        /* 2. СКРОЛЛ КОНТЕЙНЕР */
+        .scroll-wrapper {
+            height: 100dvh;
+            width: 100vw;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .section {
+            min-height: 100dvh;
+            width: 100vw;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 40px 20px;
+            overflow: hidden;
+        }
+
+        /* 3. АНИМАЦИЯ ПЛАВНОГО ПОЯВЛЕНИЯ */
+        .content {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity var(--transition-speed), transform var(--transition-speed);
+        }
+
+        .content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 4. ФОНЫ И ОФОРМЛЕНИЕ */
+        .bg-photo {
+            background-image: url('фон_главная.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .bg-photo::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--overlay);
+            z-index: 1;
+        }
+
+        .theme-dark { background-color: var(--burgundy); color: var(--white); }
+
+        /* ВЕРНУЛИ ГЛАВНЫЙ БЛОК */
+        .hero-border { 
+            border: 1px solid var(--burgundy); 
+            padding: 30px 15px;
+            width: 90%;
+            max-width: 350px;
+            background-color: rgba(249, 247, 242, 0.4);
+            backdrop-filter: blur(2px);
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 10vw, 3.5rem);
+            line-height: 1.1;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 400;
+            color: var(--burgundy);
+        }
+
+        h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 6vw, 1.8rem); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; }
+        
+        p { font-size: clamp(0.85rem, 3.5vw, 0.95rem); line-height: 1.6; margin-bottom: 15px; }
+
+        /* ПРЯМОУГОЛЬНОЕ ФОТО */
+        .photo-frame {
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 3 / 4; 
+            margin: 0 auto 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px;
+            overflow: hidden;
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .program-item { margin-bottom: 15px; }
+        .program-time { font-family: 'Playfair Display', serif; font-size: 1.6rem; display: block; }
+        .program-desc { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: 1px solid currentColor;
+            color: inherit;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            background: transparent;
+        }
+
+        .palette { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+        .color-circle { width: 35px; height: 35px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* 5. АНКЕТА (БЕЛЫЙ ТЕКСТ) */
+        form { width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .form-group { text-align: left; width: 100%; }
+        .form-group label { display: block; font-size: 0.7rem; margin-bottom: 5px; text-transform: uppercase; color: var(--white); letter-spacing: 1px; }
+        
+        input[type="text"], select { 
+            width: 100%; padding: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+            background: rgba(255, 255, 255, 0.05); 
+            color: var(--white); /* Текст белый */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem; 
+            border-radius: 0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        ::placeholder { color: rgba(255, 255, 255, 0.5); }
+        
+        select option { background-color: var(--burgundy); color: var(--white); }
+
+        .submit-btn {
+            width: 100%; background: var(--white); color: var(--burgundy); 
+            border: none; font-weight: 600; padding: 16px;
+            text-transform: uppercase; letter-spacing: 2px; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="preloader">
+    <div id="loader-number">0%</div>
+    <div class="loader-bar-bg"><div id="loader-bar-fill"></div></div>
+</div>
+
+<div class="scroll-wrapper">
+
+    <section class="section bg-photo">
+        <div class="content">
+            <div class="hero-border">
+                <h1>WEDDING<br>DAY</h1>
+                <p style="letter-spacing: 3px; font-weight: 500; margin-bottom: 5px; text-transform: uppercase;">Игорь и Ольга</p>
+                <p style="font-size: 1.5rem; font-family: 'Playfair Display', serif;">12.10.2025</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section theme-dark">
+        <div class="content">
+            <div class="photo-frame">
+                <img src="молодые.jpg" alt="Пара">
+            </div>
+            <h2>Дорогие друзья!</h2>
+            <p>В нашей жизни предстоит одно из самых важных событий — день нашей свадьбы. Мы приглашаем вас разделить этот праздник вместе с нами.</p>
+        </div>
+    </section>
+
+    <section class="section bg-photo">
+        <div class="content">
+            <h2>Программа дня</h2>
+            <div class="program-item"><span class="program-time">15:30</span><span class="program-desc">Сбор гостей и фуршет</span></div>
+            <div class="program-item"><span class="program-time">16:00</span><span class="program-desc">Торжественная церемония</span></div>
+            <div class="program-item"><span class="program-time">18:00</span><span class="program-desc">Праздничный ужин</span></div>
+        </div>
+    </section>
+
+    <section class="section theme-dark">
+        <div class="content">
+            <div class="photo-frame" style="aspect-ratio: 16/9; max-width: 320px; height: auto;">
+                <img src="ресторан.jpg" alt="Место">
+            </div>
+            <h2>Место встречи</h2>
+            <p style="font-weight: 500;">Загородный клуб «Artiland»</p>
+            <p style="opacity: 0.8; font-size: 0.8rem;">Балашиха, Новское шоссе, 10</p>
+            <a href="https://yandex.ru/maps/" target="_blank" class="btn">Открыть карту</a>
+        </div>
+    </section>
+
+    <section class="section bg-photo">
+        <div class="content">
+            <h2>Dress Code</h2>
+            <p>Будем благодарны, если вы поддержите палитру нашей свадьбы:</p>
+            <div class="palette">
+                <div class="color-circle" style="background:#4a0202"></div>
+                <div class="color-circle" style="background:#8c2020"></div>
+                <div class="color-circle" style="background:#d89696"></div>
+                <div class="color-circle" style="background:#eaddd3"></div>
+                <div class="color-circle" style="background:#ffffff"></div>
+            </div>
+            <p>Вместо цветов мы будем рады бутылочке вашего любимого вина.</p>
+        </div>
+    </section>
+
+    <section class="section theme-dark">
+        <div class="content">
+            <h2>Анкета</h2>
+            <form>
+                <div class="form-group">
+                    <label>Имя и Фамилия</label>
+                    <input type="text" placeholder="Иван и Мария">
+                </div>
+                <div class="form-group">
+                    <label>Ваше присутствие</label>
+                    <select>
+                        <option>Придем</option>
+                        <option>Не сможем</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Напитки</label>
+                    <input type="text" placeholder="Вино, виски...">
+                </div>
+                <button type="button" class="submit-btn">Отправить</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="section bg-photo">
+        <div class="content">
+            <h1 style="font-size: 2rem; color: var(--burgundy);">До встречи!</h1>
+            <p>Координатор Ангелина:</p>
+            <p style="font-size: 1.2rem; font-weight: 500; border-bottom: 1px solid var(--burgundy); display: inline-block; margin-bottom: 25px;">8 (999) 999-99-99</p>
+            <p style="letter-spacing: 3px; font-weight: 600; text-transform: uppercase;">С любовью,<br>Игорь и Ольга</p>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // 1. ПРЕДЗАГРУЗКА
+    window.addEventListener('load', () => {
+        const num = document.getElementById('loader-number');
+        const fill = document.getElementById('loader-bar-fill');
+        const preloader = document.getElementById('preloader');
+        let count = 0;
+        const interval = setInterval(() => {
+            count += 2;
+            num.innerText = count + '%';
+            fill.style.width = count + '%';
+            if (count >= 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 800);
+                }, 300);
+            }
+        }, 20);
+    });
+
+    // 2. ПЛАВНОЕ ПОЯВЛЕНИЕ КОНТЕНТА
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.content').forEach(c => observer.observe(c));
+</script>
+
+</body>
+</html>
